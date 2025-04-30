@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Alasan Ingin Bertemu Hindia</title>
+  <style>
+    body, html {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      font-family: Arial, sans-serif;
+      background: url('https://cdn.rri.co.id/berita/Semarang/o/1740381239679-Snapinst.app_480797677_18497877550003256_8906789112994599834_n_1080/y2s4i6led01i814.jpeg') no-repeat center center fixed;
+      background-size: cover;
+      overflow: hidden;
+    }
+
+    .start-screen, .main-content, .final-screen, .end-screen {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      background-color: rgba(0,0,0,0.6);
+      z-index: 1;
+    }
+
+    .start-screen h1,
+    .final-screen h1,
+    .end-screen h1 {
+      color: white;
+      font-size: 32px;
+      margin-bottom: 30px;
+      text-align: center;
+    }
+
+    .start-screen button,
+    .final-screen button {
+      margin: 10px;
+      padding: 12px 24px;
+      font-size: 18px;
+      background: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+
+    .start-screen button:hover,
+    .final-screen button:hover {
+      background: #ddd;
+    }
+
+    .bubble-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 60px;
+      flex-wrap: wrap;
+      position: relative;
+      z-index: 2;
+    }
+
+    .bubble-row {
+      display: flex;
+      justify-content: center;
+      gap: 30px;
+      margin-bottom: 10px;
+    }
+
+    .bubble {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-weight: bold;
+      cursor: pointer;
+      transition: transform 0.2s, opacity 0.5s;
+    }
+
+    .bubble:hover {
+      transform: scale(1.2);
+    }
+
+    .bubble.clicked {
+      opacity: 0.2;
+      pointer-events: none;
+    }
+
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0, 0, 0, 0.8);
+      justify-content: center;
+      align-items: center;
+      z-index: 3;
+    }
+
+    .modal-content {
+      background: #fff;
+      color: #000;
+      padding: 20px;
+      border-radius: 10px;
+      max-width: 400px;
+      text-align: center;
+    }
+
+    .close-btn {
+      margin-top: 15px;
+      background: #000;
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      cursor: pointer;
+      border-radius: 5px;
+    }
+  </style>
+</head>
+<body>
+
+<!-- Halaman Awal -->
+<div class="start-screen" id="startScreen">
+  <h1>Seberapa mau ketemu Hindia?</h1>
+  <button onclick="start()">mau BANGETLAH</button>
+  <button onclick="start()">yah, pake nanya</button>
+</div>
+
+<!-- Halaman Bubble -->
+<div class="main-content" id="mainContent" style="display: none;">
+  <div class="bubble-container" id="bubbleContainer"></div>
+</div>
+
+<!-- Modal Alasan -->
+<div class="modal" id="modal">
+  <div class="modal-content">
+    <p id="reasonText">Alasan muncul di sini</p>
+    <button class="close-btn" onclick="closeModal()">Tutup</button>
+  </div>
+</div>
+
+<!-- Halaman Akhir Pertanyaan -->
+<div class="final-screen" id="finalScreen" style="display: none;">
+  <h1>udah semua dibaca alasannya?</h1>
+  <button onclick="showEnding()">ayey captain!</button>
+</div>
+
+<!-- Pesan Akhir -->
+<div class="end-screen" id="endScreen" style="display: none;">
+  <h1>udah min itu aja, p adu effort</h1>
+</div>
+
+<script>
+  const words = ["GOT", "BEAT", "DOWN", "BY", "THE", "WORLD"];
+  const reasons = [
+    "yaa kali gamau ketemu Baskaraa",
+    "mau foto dongg",
+    "video juga boleh, apalagi tiktokan",
+    "mau liat bentukan si 'cari suara lo' itu secara langsung",
+    "mau denger suaranya langsung",
+    "salaman dikit boleh kali ya, *punten nona meidiana izin",
+    "mau say thankyou kali ya",
+    "gatau lagi mau ngetik apa ini",
+    "mau foto pose velocity bisa ga ya",
+    "mau denger ketawanya kali ya",
+    "pokoknya ketemu aja dulu lah ya",
+    "udah habis ini kata-katanya",
+    "mau ketemu Baskara dulu minta kata-kata boleh?",
+    "ini",
+	"sudah",
+	"cukup",
+    "darinya aku tau, 'secukupnya' itu kadang justru yang bikin lega",
+    "darinya aku sadar, aku pernah dicintai seada-adanya",
+    "darinya aku sadar, mencintai itu susah apalagi diri sendiri",
+    "darinya aku tau, gapapa untuk mengucapkan 'iya.. sebentar'",
+    "itu aja deh, thankyou mas babazz"
+  ];
+
+  let clickedCount = 0;
+  const totalBubbles = words.join('').length;
+  let globalIndex = 0;
+
+  function start() {
+    document.getElementById("startScreen").style.display = "none";
+    document.getElementById("mainContent").style.display = "flex";
+  }
+
+  function showReason(index, el) {
+    document.getElementById("reasonText").textContent = reasons[index];
+    document.getElementById("modal").style.display = "flex";
+    if (!el.classList.contains("clicked")) {
+      el.classList.add("clicked");
+      clickedCount++;
+      if (clickedCount === totalBubbles) {
+        setTimeout(() => {
+          document.getElementById("mainContent").style.display = "none";
+          document.getElementById("finalScreen").style.display = "flex";
+        }, 500);
+      }
+    }
+  }
+
+  function closeModal() {
+    document.getElementById("modal").style.display = "none";
+  }
+
+  function showEnding() {
+    document.getElementById("finalScreen").style.display = "none";
+    document.getElementById("endScreen").style.display = "flex";
+  }
+
+  function generateBubbles() {
+    const container = document.getElementById("bubbleContainer");
+    words.forEach((word) => {
+      const row = document.createElement("div");
+      row.className = "bubble-row";
+      // Memastikan setiap karakter dalam kata dibubuhkan pada bubble
+      for (let i = 0; i < word.length; i++) {
+        const bubble = document.createElement("div");
+        bubble.className = "bubble";
+        const bg = ['#000', '#888', '#fff'][Math.floor(Math.random() * 3)];
+        bubble.style.backgroundColor = bg;
+        bubble.style.color = (bg === "#000") ? "#fff" : "#000";
+        bubble.textContent = word.charAt(i); // Ambil karakter untuk bubble
+        const currentIndex = globalIndex; // Menyimpan index yang benar
+        bubble.onclick = () => showReason(currentIndex, bubble);
+        globalIndex++; // Menambahkan index global setelah setiap bubble
+        row.appendChild(bubble);
+      }
+      container.appendChild(row);
+    });
+  }
+
+  generateBubbles();
+</script>
+
+</body>
+</html>
